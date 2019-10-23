@@ -5,6 +5,7 @@ import java.util.UUID;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.sri.entity.Cache;
@@ -72,5 +73,5 @@ public class CacheServiceImple extends BaseImple<Cache> implements CacheService 
 		Cache record = cacheRepository.findByUid(uuid);
 		return record.getFinished() != 0;
 	}
-
+	
 }

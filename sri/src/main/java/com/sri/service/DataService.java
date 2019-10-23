@@ -3,6 +3,7 @@ package com.sri.service;
 import java.util.List;
 
 import com.sri.entity.Data;
+import com.sri.entity.User;
 
 /**
  * Data persistence business logic layer
@@ -16,4 +17,5 @@ public interface DataService extends BaseService<Data> {
 
 	public List<Data> findByUserId(int id);
     public List<Data> findByUserIdAndType(int id, String type);
+    public void doAccessJob(String uuid, User user);
 }
