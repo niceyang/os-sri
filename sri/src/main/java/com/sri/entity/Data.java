@@ -26,16 +26,14 @@ public class Data {
 	@Column(name = "userid")
 	private int userId;
 
-	@Column(name = "type")
-	private String type;
+	@Column(name = "category")
+	private String category;
+	
+	@Column(name = "subcategory")
+	private String subcategory;
 	
 	@Column(name = "data")
 	private String data;
-
-	@Override
-	public String toString() {
-		return "Data [id=" + id + ", userId=" + userId + ", type=" + type + ", data=" + data + "]";
-	}
 
 	public int getId() {
 		return id;
@@ -53,12 +51,20 @@ public class Data {
 		this.userId = userId;
 	}
 
-	public String getType() {
-		return type;
+	public String getCategory() {
+		return category;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public String getSubcategory() {
+		return subcategory;
+	}
+
+	public void setSubcategory(String subcategory) {
+		this.subcategory = subcategory;
 	}
 
 	public String getData() {

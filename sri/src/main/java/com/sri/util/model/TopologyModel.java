@@ -1,20 +1,16 @@
 package com.sri.util.model;
 
+import java.util.List;
+
 public class TopologyModel {
-	String categoryValue;
-	
-	public TopologyModel(String categoryValue) {
-		super();
-		this.categoryValue = categoryValue;
+	List<Category> categories;
+
+	public List<Category> getCategories() {
+		return categories;
 	}
 
-	public String getCategoryValue() {
-		return categoryValue;
+	public void setCategories(List<Category> categories) {
+		this.categories = categories;
 	}
-
-	public void setCategoryValue(String categoryValue) {
-		this.categoryValue = categoryValue;
-	}
-	
 	
 }

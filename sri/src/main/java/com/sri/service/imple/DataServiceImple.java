@@ -1,6 +1,11 @@
 package com.sri.service.imple;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -16,6 +21,8 @@ import com.sri.entity.User;
 import com.sri.reporsitory.DataRepository;
 import com.sri.service.CacheService;
 import com.sri.service.DataService;
+import com.sri.util.model.Category;
+import com.sri.util.model.TopologyModel;
 
 /**
  * Data persistence business logic layer
@@ -51,7 +58,7 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 	}
 
 	@Async
-	public void doAccessJob(String uuid, User user) {
+	public void doAccessJob(String uuid, User user, TopologyModel topo) {
 		Cache cache = cacheService.findJob(uuid);
 		List<Data> data = findByUserId(user.getId());
 		ObjectMapper mapper = new ObjectMapper();
@@ -70,6 +77,32 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 		cache.setData(jdata);
 		cache.setFinished(1);
 		cacheService.update(cache);
+	}
+	
+	private Map<String, Map<String, List<Data>>> proces(List<Data> data, TopologyModel topo) {
+		Map<String, Map<String, List<Data>>> res = new HashMap<>();
+		Map<String, Set<String>> topoMap = new HashMap<>();
+		
+		for (Category cate : topo.getCategories()) {
+			topoMap.put(cate.getVal(), new HashSet());
+			if (cate.getSubCategories() != null) {
+				for (Category sub : cate.getSubCategories()) {
+					topoMap.get(cate.getVal()).add(sub.getVal());
+				}
+			}
+		}
+		// build res
+		for (Category cate : topo.getCategories()) {
+			res.put(cate.getVal(), new HashMap());
+			if (cate.getSubCategories() != null) {
+				for (Category sub : cate.getSubCategories()) {
+					res.get(cate.getVal()).put(sub.getVal(), new ArrayList<>());
+				}
+			}
+		}
+		
+		
+		return res;
 	}
 
 }

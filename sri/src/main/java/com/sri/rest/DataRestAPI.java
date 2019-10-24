@@ -60,7 +60,7 @@ public class DataRestAPI {
 			default: throw new InvalidException("PI TYPE UNSUPPORTED");
 		}
 		// Asynch doing job
-		dataService.doAccessJob(uuid, user);
+		dataService.doAccessJob(uuid, user, req.getTopology());
 		
 		return responseService.buildResponse(uuid, Constant.RESPONSE_TYPE_CALLBACK_ID, uuid);
 	}
