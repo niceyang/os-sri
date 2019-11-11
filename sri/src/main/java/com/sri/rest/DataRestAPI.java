@@ -52,14 +52,17 @@ public class DataRestAPI {
 				user = userService.getUserByEmail(req.getPiData());
 				break;
 			case Constant.PII_PHONE: 
-				user = userService.getUserByName(req.getPiData());
+				user = userService.getUserByPhone(req.getPiData());
 				break;
 			case Constant.PII_NAME: 
-				user = userService.getUserByPhone(req.getPiData());
+				user = userService.getUserByName(req.getPiData());
 				break;
 			default: throw new InvalidException("PI TYPE UNSUPPORTED");
 		}
 		// Asynch doing job
+		if (user == null) {
+			throw new NotFoundException("User is not found");
+		}
 		dataService.doAccessJob(uuid, user, req.getTopology());
 		
 		return responseService.buildResponse(uuid, Constant.RESPONSE_TYPE_CALLBACK_ID, uuid);

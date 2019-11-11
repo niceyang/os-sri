@@ -34,9 +34,6 @@ public class Cache {
 	@Column(name="data")
 	private String data;
 	
-	@Column(name="number")
-	private String number;
-	
 	@Column(name="created")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
@@ -51,7 +48,7 @@ public class Cache {
 
 	@Override
 	public String toString() {
-		return "Cache [id=" + id + ", uuid=" + uid + ", data=" + data + ", number=" + number + ", created=" + created
+		return "Cache [id=" + id + ", uuid=" + uid + ", data=" + data + ", created=" + created
 				+ ", finished=" + finished + "]";
 	}
 
@@ -77,14 +74,6 @@ public class Cache {
 
 	public void setData(String data) {
 		this.data = data;
-	}
-
-	public String getNumber() {
-		return number;
-	}
-
-	public void setNumber(String number) {
-		this.number = number;
 	}
 
 	public Date getCreated() {

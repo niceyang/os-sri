@@ -52,11 +52,6 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 		return dataRepository.findByUserId(id);
 	}
 
-	@Override
-	public List<Data> findByUserIdAndType(int id, String type) {
-		return dataRepository.findByUserIdAndType(id, type);
-	}
-
 	@Async
 	public void doAccessJob(String uuid, User user, TopologyModel topo) {
 		Cache cache = cacheService.findJob(uuid);
@@ -65,7 +60,6 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 		String jdata = null;
 		try {
 			jdata = mapper.writeValueAsString(data);
-			System.out.println(jdata);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 			cache.setData("Faild");
@@ -74,26 +68,36 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 			return;
 		}
 		
+		// To simulate the time-consuming processing
+		try {
+			Thread.sleep(1000);
+			System.out.println(jdata);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		
 		cache.setData(jdata);
 		cache.setFinished(1);
 		cacheService.update(cache);
 	}
 	
-	private Map<String, Map<String, List<Data>>> proces(List<Data> data, TopologyModel topo) {
+	// Two layer only
+	private Map<String, Map<String, List<Data>>> proces(List<Data> dataList, TopologyModel topo) {
 		Map<String, Map<String, List<Data>>> res = new HashMap<>();
 		Map<String, Set<String>> topoMap = new HashMap<>();
 		
 		for (Category cate : topo.getCategories()) {
-			topoMap.put(cate.getVal(), new HashSet());
+			topoMap.put(cate.getVal(), new HashSet<>());
 			if (cate.getSubCategories() != null) {
 				for (Category sub : cate.getSubCategories()) {
 					topoMap.get(cate.getVal()).add(sub.getVal());
 				}
 			}
 		}
+		
 		// build res
 		for (Category cate : topo.getCategories()) {
-			res.put(cate.getVal(), new HashMap());
+			res.put(cate.getVal(), new HashMap<>());
 			if (cate.getSubCategories() != null) {
 				for (Category sub : cate.getSubCategories()) {
 					res.get(cate.getVal()).put(sub.getVal(), new ArrayList<>());
@@ -101,6 +105,9 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 			}
 		}
 		
+		for (Data data : dataList) {
+			res.get(data.getCategory()).get(data.getSubcategory()).add(data);
+		}
 		
 		return res;
 	}

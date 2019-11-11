@@ -19,6 +19,47 @@ public class ResponseBody {
 		this.responseType = responseType;
 		this.data = data;
 	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public String getCompanyID() {
+		return companyID;
+	}
+
+	public void setCompanyID(String companyID) {
+		this.companyID = companyID;
+	}
+
+	public String getCallbackID() {
+		return callbackID;
+	}
+
+	public void setCallbackID(String callbackID) {
+		this.callbackID = callbackID;
+	}
+
+	public String getResponseType() {
+		return responseType;
+	}
+
+	public void setResponseType(String responseType) {
+		this.responseType = responseType;
+	}
+
+	public String getData() {
+		return data;
+	}
+
+	public void setData(String data) {
+		this.data = data;
+	}
+	
 }
 
 

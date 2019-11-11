@@ -17,6 +17,5 @@ import com.sri.util.model.TopologyModel;
 public interface DataService extends BaseService<Data> {
 
 	public List<Data> findByUserId(int id);
-    public List<Data> findByUserIdAndType(int id, String type);
     public void doAccessJob(String uuid, User user, TopologyModel topo);
 }

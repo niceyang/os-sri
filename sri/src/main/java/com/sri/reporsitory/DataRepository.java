@@ -13,5 +13,4 @@ import com.sri.entity.Data;
  */
 public interface DataRepository extends JpaRepository<Data, Integer> {
     public List<Data> findByUserId(int id);
-    public List<Data> findByUserIdAndType(int id, String type);
 }

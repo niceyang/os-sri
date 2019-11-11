@@ -16,5 +16,4 @@ public class SriApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SriApplication.class, args);
 	}
-
 }
