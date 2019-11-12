@@ -4,6 +4,7 @@ public class Identifier {
 	String table;
 	String field;
 	String type;
+	String idField;
 	
 	public String getTable() {
 		return table;
@@ -23,9 +24,19 @@ public class Identifier {
 	public void setType(String type) {
 		this.type = type;
 	}
+	public String getIdField() {
+		return idField;
+	}
+	public void setIdField(String idField) {
+		this.idField = idField;
+	}
+	public Identifier() {}
 	
-	@Override
-	public String toString() {
-		return "Identifier [table=" + table + ", field=" + field + ", type=" + type + "]";
+	public Identifier(String table, String field, String type, String idField) {
+		super();
+		this.table = table;
+		this.field = field;
+		this.type = type;
+		this.idField = idField;
 	}
 }

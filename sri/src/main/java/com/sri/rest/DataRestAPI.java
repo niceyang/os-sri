@@ -1,12 +1,12 @@
 package com.sri.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,7 +19,7 @@ import com.sri.service.DataService;
 import com.sri.service.UserService;
 import com.sri.service.imple.ResponseService;
 import com.sri.util.Constant;
-import com.sri.util.model.RequestBody;
+import com.sri.util.model.RequestModel;
 import com.sri.util.model.ResponseBody;
 
 /**
@@ -44,26 +44,14 @@ public class DataRestAPI {
 	private ResponseService responseService;
 	
 	@PostMapping("access")
-	public ResponseBody access(RequestBody req) {
+	public ResponseBody access(@RequestBody RequestModel req) {
 		String uuid = cacheService.createJob();
-		User user = null;
-		switch (req.getPiType()) {
-			case Constant.PII_EMAIL: 
-				user = userService.getUserByEmail(req.getPiData());
-				break;
-			case Constant.PII_PHONE: 
-				user = userService.getUserByPhone(req.getPiData());
-				break;
-			case Constant.PII_NAME: 
-				user = userService.getUserByName(req.getPiData());
-				break;
-			default: throw new InvalidException("PI TYPE UNSUPPORTED");
+		Integer id = userService.queryUser(req.getPiType(), req.getPiData());
+		if (id == null) {
+			throw new InvalidException("PI TYPE UNSUPPORTED OR USER NOT FOUND");
 		}
-		// Asynch doing job
-		if (user == null) {
-			throw new NotFoundException("User is not found");
-		}
-		dataService.doAccessJob(uuid, user, req.getTopology());
+		
+		dataService.doAccessJob(uuid, id, req.getTopology());
 		
 		return responseService.buildResponse(uuid, Constant.RESPONSE_TYPE_CALLBACK_ID, uuid);
 	}
@@ -84,17 +72,17 @@ public class DataRestAPI {
 	}
 	
 	@DeleteMapping("delete")
-	public ResponseBody erase(RequestBody req) {
+	public ResponseBody erase(@RequestBody RequestModel req) {
 		return responseService.buildResponse(null, Constant.RESPONSE_TYPE_STATUS, "OK");
 	}
 	
 	@PostMapping("portable")
-	public ResponseBody portable(RequestBody req) {
+	public ResponseBody portable(@RequestBody RequestModel req) {
 		return responseService.buildResponse(null, Constant.RESPONSE_TYPE_STATUS, "OK");
 	}
 	
 	@PutMapping("edit")
-	public ResponseBody edit(RequestBody req) {
+	public ResponseBody edit(@RequestBody RequestModel req) {
 		return responseService.buildResponse(null, Constant.RESPONSE_TYPE_STATUS, "OK");
 	}
 }

@@ -9,6 +9,7 @@ public class PIITag {
 	List<String> categorySub1;
 	List<String> categorySub2;
 	List<String> piiFields;
+	
 	public String getTable() {
 		return table;
 	}

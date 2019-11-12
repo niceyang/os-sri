@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,9 @@ import com.sri.reporsitory.DataRepository;
 import com.sri.service.CacheService;
 import com.sri.service.DataService;
 import com.sri.util.model.Category;
+import com.sri.util.model.DataModel;
+import com.sri.util.model.PIITag;
+import com.sri.util.model.ResultCandidate;
 import com.sri.util.model.TopologyModel;
 
 /**
@@ -35,12 +39,21 @@ import com.sri.util.model.TopologyModel;
  */
 @Service
 public class DataServiceImple extends BaseImple<Data> implements DataService {
+	private static final String SELECT = " SELECT ";
+	private static final String FROM = " FROM ";
+	private static final String WHERE = " WHERE ";
 
 	@Autowired
 	private DataRepository dataRepository;
 	
 	@Autowired
 	private CacheService cacheService;
+	
+	@Autowired
+	private MappingService mappingService;
+	
+	@Autowired
+    private JdbcTemplate jdbcTemplate;
 
 	@PostConstruct
 	public void initParent() {
@@ -53,13 +66,40 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 	}
 
 	@Async
-	public void doAccessJob(String uuid, User user, TopologyModel topo) {
+	public void doAccessJob(String uuid, int userId, TopologyModel topo) {
+		List<Set<String>> queryIndexList = new ArrayList<>();
+		List<ResultCandidate> resCandidates = new ArrayList<>(); // Index name [A-A1-A12], tale tag info
+		
+		for (Category cate : topo.getCategories()) {
+			Set<String> indexSet = new HashSet<>();
+			mappingService.buildIndex(cate, new StringBuilder(), indexSet);
+			queryIndexList.add(indexSet);
+		}
+		
+		Map<String, Set<String>> tableIndexs = mappingService.getTableIndexs();
+		Map<String, PIITag> tabTags = mappingService.getTableDict();
+		
+		for (String tableName : tableIndexs.keySet()) { // all tables index
+			Set<String> tableIndex = tableIndexs.get(tableName);
+			checkTable : for (Set<String> queryIndexSet : queryIndexList) { // all query index
+				for (String index : queryIndexSet) {
+					if (tableIndex.contains(index)) {
+						resCandidates.add(new ResultCandidate(index, tabTags.get(tableName)));
+						break checkTable;
+					}
+				}
+			}
+		}
+		
+		generateQueries(userId, resCandidates);
+		List<DataModel> dataRecords = queryData(resCandidates);
+		
 		Cache cache = cacheService.findJob(uuid);
-		List<Data> data = findByUserId(user.getId());
+		// old data collections
 		ObjectMapper mapper = new ObjectMapper();
 		String jdata = null;
 		try {
-			jdata = mapper.writeValueAsString(data);
+			jdata = mapper.writeValueAsString(dataRecords);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 			cache.setData("Faild");
@@ -67,6 +107,7 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 			cacheService.update(cache);
 			return;
 		}
+		// old data collections ends
 		
 		// To simulate the time-consuming processing
 		try {
@@ -77,8 +118,48 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 		}
 		
 		cache.setData(jdata);
-		cache.setFinished(1);
+		cache.setFinished(9);
 		cacheService.update(cache);
+	}
+	
+	// Generate queries
+	private void generateQueries(int userId, List<ResultCandidate> resCandidates) {
+		for (ResultCandidate candidate : resCandidates) {
+			StringBuilder sb = new StringBuilder();
+			PIITag tag = candidate.getTag();
+			sb.append(SELECT);
+			for (String col : tag.getPiiFields()) {
+				sb.append(" ").append(col).append(",");
+			}
+			sb.setLength(sb.length() - 1);
+			sb.append(FROM)
+				.append(tag.getTable())
+				.append(WHERE)
+				.append(tag.getIdField())
+				.append(" = ")
+				.append(userId)
+				.append(";");
+			candidate.setQuery(sb.toString());
+			System.out.println(sb.toString());
+		}
+	}
+	
+	// Generate queries
+	private List<DataModel> queryData(List<ResultCandidate> candidates) {
+		List<DataModel> res = new ArrayList<>();
+		for (ResultCandidate candi : candidates) {
+			DataModel data = new DataModel();
+			String[] index = candi.getIndex().split("-");
+			data.setCategory(index.length > 0 ? index[0] : "");
+			data.setSubCategory1(index.length > 1 ? index[1] : "");
+			data.setSubCategory2(index.length > 2 ? index[2] : "");
+			
+			List<Map<String, Object>> list = jdbcTemplate.queryForList(candi.getQuery());
+			data.setData(list);
+			res.add(data);
+		}
+		
+		return res;
 	}
 	
 	// Two layer only

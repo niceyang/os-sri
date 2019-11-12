@@ -4,12 +4,12 @@ package com.sri.util.model;
  * The model for 
  * 
  */
-public class RequestBody {
+public class RequestModel {
 	String piType;
 	String piData;
 	TopologyModel topology;
 	
-	public RequestBody(String piType, String piData, TopologyModel topology) {
+	public RequestModel(String piType, String piData, TopologyModel topology) {
 		super();
 		this.piType = piType;
 		this.piData = piData;

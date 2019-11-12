@@ -47,11 +47,12 @@ public class MappingConfig {
 	      while ((st = br.readLine()) != null) {
 	    	  sb.append(st);
 	      }
-	      List<Identifier> tagList = objectMapper.readValue(sb.toString(), new TypeReference<List<PIITag>>(){});
+	      List<PIITag> tagList = objectMapper.readValue(sb.toString(), new TypeReference<List<PIITag>>(){});
 	      System.out.println(tagList);
 	      
 	      br.close();
 	      
+	      mappingService.buildIndex(identifierList, tagList);
 	      
 	    } catch (Exception e) {
 	      e.printStackTrace();
