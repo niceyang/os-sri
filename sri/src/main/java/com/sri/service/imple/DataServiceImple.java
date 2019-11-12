@@ -1,6 +1,7 @@
 package com.sri.service.imple;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,10 +19,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sri.entity.Cache;
 import com.sri.entity.Data;
-import com.sri.entity.User;
 import com.sri.reporsitory.DataRepository;
 import com.sri.service.CacheService;
 import com.sri.service.DataService;
+import com.sri.util.Util;
 import com.sri.util.model.Category;
 import com.sri.util.model.DataModel;
 import com.sri.util.model.PIITag;
@@ -42,6 +43,8 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 	private static final String SELECT = " SELECT ";
 	private static final String FROM = " FROM ";
 	private static final String WHERE = " WHERE ";
+	private static final String SET = " SET ";
+	private static final String UPDATE = " UPDATE ";
 
 	@Autowired
 	private DataRepository dataRepository;
@@ -95,7 +98,6 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 		List<DataModel> dataRecords = queryData(resCandidates);
 		
 		Cache cache = cacheService.findJob(uuid);
-		// old data collections
 		ObjectMapper mapper = new ObjectMapper();
 		String jdata = null;
 		try {
@@ -107,7 +109,6 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 			cacheService.update(cache);
 			return;
 		}
-		// old data collections ends
 		
 		// To simulate the time-consuming processing
 		try {
@@ -118,10 +119,42 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 		}
 		
 		cache.setData(jdata);
-		cache.setFinished(9);
+		cache.setFinished(1);
 		cacheService.update(cache);
 	}
 	
+	@Async
+	public void doEraseJob(int userId) {
+		Map<String, PIITag> tabTags = mappingService.getTableDict();
+		List<String> queries = generateEraseQueries(userId, tabTags.values());
+		eraseData(queries);
+	}
+	
+	private List<String> generateEraseQueries(int userId, Collection<PIITag> values) {
+		List<String> res = new ArrayList<>();
+		for (PIITag tag : values) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(UPDATE)
+			  .append(tag.getTable())
+			  .append(SET);
+			for (String col : tag.getPiiFields()) {
+				sb.append(" ")
+				  .append(col)
+				  .append(" = ")
+				  .append(Util.randomNumber())
+				  .append(",");
+			}
+			sb.setLength(sb.length() - 1);
+			sb.append(WHERE)
+			  .append(tag.getIdField())
+			  .append(" = ")
+			  .append(userId)
+			  .append(";");
+			res.add(sb.toString());
+		}
+		return res;
+	}
+
 	// Generate queries
 	private void generateQueries(int userId, List<ResultCandidate> resCandidates) {
 		for (ResultCandidate candidate : resCandidates) {
@@ -160,6 +193,10 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 		}
 		
 		return res;
+	}
+	
+	private void eraseData(List<String> queries) {
+		jdbcTemplate.batchUpdate(queries.toArray(new String[0]));
 	}
 	
 	// Two layer only

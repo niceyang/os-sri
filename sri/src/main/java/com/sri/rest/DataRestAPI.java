@@ -71,8 +71,19 @@ public class DataRestAPI {
 		}
 	}
 	
-	@DeleteMapping("delete")
+	@DeleteMapping("erase")
 	public ResponseBody erase(@RequestBody RequestModel req) {
+		Integer id = userService.queryUser(req.getPiType(), req.getPiData());
+		if (id == null) {
+			throw new InvalidException("PI TYPE UNSUPPORTED OR USER NOT FOUND");
+		}
+		
+		dataService.doEraseJob(id);
+		return responseService.buildResponse(null, Constant.RESPONSE_TYPE_STATUS, "OK");
+	}
+	
+	@DeleteMapping("delete")
+	public ResponseBody delete(@RequestBody RequestModel req) {
 		return responseService.buildResponse(null, Constant.RESPONSE_TYPE_STATUS, "OK");
 	}
 	
