@@ -25,6 +25,7 @@ import com.sri.service.DataService;
 import com.sri.util.Util;
 import com.sri.util.model.Category;
 import com.sri.util.model.DataModel;
+import com.sri.util.model.Identifier;
 import com.sri.util.model.PIITag;
 import com.sri.util.model.ResultCandidate;
 import com.sri.util.model.TopologyModel;
@@ -126,11 +127,12 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 	@Async
 	public void doEraseJob(int userId) {
 		Map<String, PIITag> tabTags = mappingService.getTableDict();
-		List<String> queries = generateEraseQueries(userId, tabTags.values());
+		Map<String, Identifier> identifiers = mappingService.getIdentifierDict();
+		List<String> queries = generateEraseQueries(userId, tabTags.values(), identifiers.values());
 		eraseData(queries);
 	}
 	
-	private List<String> generateEraseQueries(int userId, Collection<PIITag> values) {
+	private List<String> generateEraseQueries(int userId, Collection<PIITag> values, Collection<Identifier> identifiers) {
 		List<String> res = new ArrayList<>();
 		for (PIITag tag : values) {
 			StringBuilder sb = new StringBuilder();
@@ -147,6 +149,22 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 			sb.setLength(sb.length() - 1);
 			sb.append(WHERE)
 			  .append(tag.getIdField())
+			  .append(" = ")
+			  .append(userId)
+			  .append(";");
+			res.add(sb.toString());
+		}
+		
+		for (Identifier id : identifiers) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(UPDATE)
+			  .append(id.getTable())
+			  .append(SET);
+			sb.append(id.getField())
+			  .append(" = ")
+			  .append(Util.randomNumber());
+			sb.append(WHERE)
+			  .append(id.getIdField())
 			  .append(" = ")
 			  .append(userId)
 			  .append(";");
