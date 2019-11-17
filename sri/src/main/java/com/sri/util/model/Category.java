@@ -2,6 +2,11 @@ package com.sri.util.model;
 
 import java.util.List;
 
+/**
+ * 
+ * Category model inside topology model
+ * 
+ * */
 public class Category {
 	String val;
 	List<Category> subCategories;

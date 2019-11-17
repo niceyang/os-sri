@@ -16,8 +16,9 @@ import com.sri.util.model.ResponseBody;
 @Service
 public class ResponseService {
 	private String version = "0.1";
-	private String companyID = "amazon";
+	private String companyID = "Software Research Institute";
 
+	// Building response body
 	public ResponseBody buildResponse(String callbackID, String responseType, String data) {
 		return new ResponseBody(version, companyID, callbackID, responseType, data);
 	}

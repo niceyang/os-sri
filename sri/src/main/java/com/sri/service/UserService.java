@@ -11,8 +11,6 @@ import com.sri.entity.User;
  * The other required interfaces are added here
  */
 public interface UserService extends BaseService<User> {
-	public User getUserByName(String name);
-	public User getUserByEmail(String email);
-	public User getUserByPhone(String phone);
+	
 	public Integer queryUser(String type, String value);
 }

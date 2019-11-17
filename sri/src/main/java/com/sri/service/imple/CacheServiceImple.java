@@ -31,7 +31,8 @@ public class CacheServiceImple extends BaseImple<Cache> implements CacheService 
     public void initParent() {
         super.repository = cacheRepository;
     }
-
+    
+    // Create an async job
 	@Override
 	public String createJob() {
 		Cache nrecord = new Cache();
@@ -40,7 +41,8 @@ public class CacheServiceImple extends BaseImple<Cache> implements CacheService 
 		cacheRepository.save(nrecord);
 		return nrecord.getUid();
 	}
-
+	
+	// Update a job
 	@Override
 	public boolean updateJob(String uuid, String data) {
 		Cache record = cacheRepository.findByUid(uuid);
@@ -52,7 +54,8 @@ public class CacheServiceImple extends BaseImple<Cache> implements CacheService 
 		cacheRepository.save(record);
 		return true;
 	}
-
+	
+	// Remove a job
 	@Override
 	public boolean removeJob(String uuid) {
 		Cache record = cacheRepository.findByUid(uuid);
@@ -63,11 +66,13 @@ public class CacheServiceImple extends BaseImple<Cache> implements CacheService 
 		return true;
 	}
 
+	// Find a job by uuid
 	@Override
 	public Cache findJob(String uuid) {
 		return cacheRepository.findByUid(uuid);
 	}
-
+	
+	// Check if a job is completed
 	@Override
 	public boolean isJobCompleted(String uuid) {
 		Cache record = cacheRepository.findByUid(uuid);

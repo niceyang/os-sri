@@ -11,6 +11,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * */
 @Configuration
 public class AsynchConfig {
+	
 	@Bean("threadPoolTaskExecutor")
 	public TaskExecutor getAsyncExecutor() {
 	    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

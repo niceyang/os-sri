@@ -16,7 +16,7 @@ import com.sri.util.model.Identifier;
 import com.sri.util.model.PIITag;
 
 /*
- * Enable the multiple thread supporting for the RESTful API supporting
+ * Resolving the mapping configuration file
  * 
  * */
 
@@ -27,11 +27,12 @@ public class MappingConfig {
 	
 	@Bean("resolveConfigFile")
 	public void resolveConfigFile() {
+		
 		ObjectMapper objectMapper = new ObjectMapper();
-
 	    BufferedReader br;
+	    
 	    try {
-	      // Identifier
+	      // Identifier model
 	      br = new BufferedReader(new FileReader(new File("identifier.config"))); 
 	      StringBuilder sb = new StringBuilder();
 	      String st = null;
@@ -39,25 +40,19 @@ public class MappingConfig {
 	    	  sb.append(st);
 	      }
 	      List<Identifier> identifierList = objectMapper.readValue(sb.toString(), new TypeReference<List<Identifier>>(){});
-	      System.out.println(identifierList);
 	      
-	      // PII Tag
+	      // PII Tag model
 	      br = new BufferedReader(new FileReader(new File("piitag.config"))); 
 	      sb.setLength(0);
 	      while ((st = br.readLine()) != null) {
 	    	  sb.append(st);
 	      }
 	      List<PIITag> tagList = objectMapper.readValue(sb.toString(), new TypeReference<List<PIITag>>(){});
-	      System.out.println(tagList);
 	      
 	      br.close();
-	      
 	      mappingService.buildIndex(identifierList, tagList);
-	      
 	    } catch (Exception e) {
 	      e.printStackTrace();
 	    }
-		
 	}
-	
 }

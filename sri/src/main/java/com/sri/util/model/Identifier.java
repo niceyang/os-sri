@@ -1,5 +1,10 @@
 package com.sri.util.model;
 
+/**
+ * 
+ * Identifier model
+ * 
+ * */
 public class Identifier {
 	String table;
 	String field;

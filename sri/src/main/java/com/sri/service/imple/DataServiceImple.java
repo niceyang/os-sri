@@ -2,13 +2,10 @@ package com.sri.service.imple;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,7 +16,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sri.entity.Cache;
 import com.sri.entity.Data;
-import com.sri.reporsitory.DataRepository;
 import com.sri.service.CacheService;
 import com.sri.service.DataService;
 import com.sri.util.Util;
@@ -48,9 +44,6 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 	private static final String UPDATE = " UPDATE ";
 
 	@Autowired
-	private DataRepository dataRepository;
-	
-	@Autowired
 	private CacheService cacheService;
 	
 	@Autowired
@@ -58,17 +51,8 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 	
 	@Autowired
     private JdbcTemplate jdbcTemplate;
-
-	@PostConstruct
-	public void initParent() {
-		super.repository = dataRepository;
-	}
-
-	@Override
-	public List<Data> findByUserId(int id) {
-		return dataRepository.findByUserId(id);
-	}
-
+	
+	// Async data access
 	@Async
 	public void doAccessJob(String uuid, int userId, TopologyModel topo) {
 		List<Set<String>> queryIndexList = new ArrayList<>();
@@ -113,7 +97,7 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 		
 		// To simulate the time-consuming processing
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(30000);
 			System.out.println(jdata);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
@@ -124,6 +108,7 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 		cacheService.update(cache);
 	}
 	
+	// Async data erasure
 	@Async
 	public void doEraseJob(int userId) {
 		Map<String, PIITag> tabTags = mappingService.getTableDict();
@@ -132,6 +117,7 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 		eraseData(queries);
 	}
 	
+	// Generate erasure queries
 	private List<String> generateEraseQueries(int userId, Collection<PIITag> values, Collection<Identifier> identifiers) {
 		List<String> res = new ArrayList<>();
 		for (PIITag tag : values) {
@@ -173,7 +159,7 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 		return res;
 	}
 
-	// Generate queries
+	// Generate data access queries
 	private void generateQueries(int userId, List<ResultCandidate> resCandidates) {
 		for (ResultCandidate candidate : resCandidates) {
 			StringBuilder sb = new StringBuilder();
@@ -195,7 +181,7 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 		}
 	}
 	
-	// Generate queries
+	// Data query
 	private List<DataModel> queryData(List<ResultCandidate> candidates) {
 		List<DataModel> res = new ArrayList<>();
 		for (ResultCandidate candi : candidates) {
@@ -213,39 +199,8 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 		return res;
 	}
 	
+	// Data erasure
 	private void eraseData(List<String> queries) {
 		jdbcTemplate.batchUpdate(queries.toArray(new String[0]));
 	}
-	
-	// Two layer only
-	private Map<String, Map<String, List<Data>>> proces(List<Data> dataList, TopologyModel topo) {
-		Map<String, Map<String, List<Data>>> res = new HashMap<>();
-		Map<String, Set<String>> topoMap = new HashMap<>();
-		
-		for (Category cate : topo.getCategories()) {
-			topoMap.put(cate.getVal(), new HashSet<>());
-			if (cate.getSubCategories() != null) {
-				for (Category sub : cate.getSubCategories()) {
-					topoMap.get(cate.getVal()).add(sub.getVal());
-				}
-			}
-		}
-		
-		// build res
-		for (Category cate : topo.getCategories()) {
-			res.put(cate.getVal(), new HashMap<>());
-			if (cate.getSubCategories() != null) {
-				for (Category sub : cate.getSubCategories()) {
-					res.get(cate.getVal()).put(sub.getVal(), new ArrayList<>());
-				}
-			}
-		}
-		
-		for (Data data : dataList) {
-			res.get(data.getCategory()).get(data.getSubcategory()).add(data);
-		}
-		
-		return res;
-	}
-
 }

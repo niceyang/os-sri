@@ -1,5 +1,10 @@
 package com.sri.util.model;
 
+/**
+ * 
+ * Result candidate model (before query)
+ * 
+ * */
 public class ResultCandidate {
 	String index;
 	PIITag tag;

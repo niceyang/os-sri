@@ -28,12 +28,12 @@ public class MappingService {
 	private Map<String, Set<String>> tableIndexs = new HashMap<>();
 	private Map<String, Identifier> identifierDict = new HashMap<>();
 	
-	
+	// Build index for tables with PII tags
 	public void buildIndex(List<Identifier> listIden, List<PIITag> tagList) {
 		for (Identifier id : listIden) {
 			identifierDict.put(id.getType(), id);
 		}
-		System.out.println(identifierDict);
+		
 		for (PIITag table : tagList) {
 			tableDict.put(table.getTable(), table);
 			Set<String> indexSet = new HashSet<>();
@@ -44,6 +44,7 @@ public class MappingService {
 		}
 	}
 	
+	// Build index for incoming query with topology model
 	public void buildIndex(Category cate, StringBuilder sb, Set<String> res){
 		int oriLen = sb.length();
 		
@@ -62,7 +63,8 @@ public class MappingService {
 		
 		sb.setLength(oriLen);
 	}
-
+	
+	// Build index for tables with PII tags
 	private void buildIndex(PIITag table, int index, StringBuilder sb, Set<String> res) {
 	  int oriLen = sb.length();
 	  switch(index) {

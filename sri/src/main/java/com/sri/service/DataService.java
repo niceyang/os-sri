@@ -1,7 +1,5 @@
 package com.sri.service;
 
-import java.util.List;
-
 import com.sri.entity.Data;
 import com.sri.util.model.TopologyModel;
 
@@ -15,7 +13,6 @@ import com.sri.util.model.TopologyModel;
  */
 public interface DataService extends BaseService<Data> {
 
-	public List<Data> findByUserId(int id);
     public void doAccessJob(String uuid, int id, TopologyModel topo);
     public void doEraseJob(int userId);
 }

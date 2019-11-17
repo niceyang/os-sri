@@ -1,9 +1,12 @@
-package com.sri.exception;
+package com.sri.exception.handler;
 
 import java.lang.reflect.Method;
 
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 
+/**
+ * The global exception handler for the AsyncUncaught Exception
+ */
 public class AsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
 
   @Override

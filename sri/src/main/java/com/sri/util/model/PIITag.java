@@ -2,6 +2,11 @@ package com.sri.util.model;
 
 import java.util.List;
 
+/**
+ * 
+ * PII Tag model
+ * 
+ * */
 public class PIITag {
 	String table;
 	String idField;

@@ -1,7 +1,7 @@
 package com.sri.util.model;
 /**
  * 
- * The model for 
+ * Data model for coming request
  * 
  */
 public class RequestModel {

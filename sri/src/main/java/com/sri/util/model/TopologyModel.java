@@ -2,6 +2,11 @@ package com.sri.util.model;
 
 import java.util.List;
 
+/**
+ * 
+ * Topology model
+ * 
+ * */
 public class TopologyModel {
 	List<Category> categories;
 

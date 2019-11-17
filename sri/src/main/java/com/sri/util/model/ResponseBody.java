@@ -1,7 +1,7 @@
 package com.sri.util.model;
 /**
  * 
- * The model for the error response
+ * Data model for the response
  * 
  */
 public class ResponseBody {

@@ -3,6 +3,11 @@ package com.sri.util.model;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 
+ * Data model for per table
+ * 
+ * */
 public class DataModel {
 	String category;
 	String subCategory1;
