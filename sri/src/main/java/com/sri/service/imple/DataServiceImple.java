@@ -97,7 +97,7 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 		
 		// To simulate the time-consuming processing
 		try {
-			Thread.sleep(30000);
+			Thread.sleep(3000);
 			System.out.println(jdata);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
@@ -177,7 +177,6 @@ public class DataServiceImple extends BaseImple<Data> implements DataService {
 				.append(userId)
 				.append(";");
 			candidate.setQuery(sb.toString());
-			System.out.println(sb.toString());
 		}
 	}
 	
